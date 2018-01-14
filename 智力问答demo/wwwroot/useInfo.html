@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no"/>
+		<title>个人资料-智力问答</title>
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css"/>
+		<link rel="stylesheet" type="text/css" href="css/all.css"/>
+	</head>
+	<body>
+		<!-- 导航条 -->
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="row">
+					<div class="navbar-title">
+						<span id="goBack" class="glyphicon glyphicon-chevron-left pull-left"></span>
+						个人资料
+						<span id="home" class="glyphicon glyphicon-home pull-right"></span>
+					</div>
+				</div>
+			</div>
+		</nav>
+		
+		<!-- 上传头像表单 -->
+		<div class="container">
+			<form action="/user/photo" method="post" enctype="multipart/form-data">
+				<div class="form-group">
+					<!-- accept="image/*" -->
+					<input type="file" name="photo" accept=".jpg,.png" autocomplete="off" />
+				</div>
+				<!-- 提交按钮 -->
+				<input type="submit" class="btn btn-success form-control" value="上传头像" />
+			</form>
+		</div>
+		
+		<!-- 模态框（Modal）-->
+		<div class="modal fade" role="dialog" id="myModal">
+			 <div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">智力</h4>
+					</div>
+					<div class="modal-body">
+						
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+<script src="js/jquery.js"></script>
+<script src="bootstrap/js/bootstrap.js"></script>
+<script>
+
+$('#goBack').click(function(){
+		// location.href = 'index.html'
+		// history.back()
+		history.go(-1)
+		// 以上三种写法都能返回
+	})
+
+	// 点击右侧注册按钮
+	$('#home').click(function(){
+		location.href = 'index.html'
+	})
+
+	// 点击上传按钮 提交数据
+	$('form').submit(function(event){
+			event.preventDefault();
+			// 1获取表单数据
+			var data = new FormData(this);
+			
+			// 2发送post请求传送数据给后台
+			$.post({
+				url:'/user/photo',
+				data:data,
+				contentType:false,
+				processData:false,
+				success:function(resData){
+					// 将返回的消息展示在模态框中
+					$('.modal-body').text(resData.message);
+						// 将模态框弹出
+					// hide.bs.modal事件：模态框消失的时候触发的事件
+					$('#myModal').modal('show').on('hide.bs.modal',function(){
+						if(resData.code == '1'){
+							location.href = 'index.html'
+						}
+					});
+				}
+
+			}); 
+		});
+</script>

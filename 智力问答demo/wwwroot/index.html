@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/all.css">
+    <title>智力问答</title>
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="row">
+					<a href="#" class="navbar-brand">智力</a>
+					<div class="navbar-title pull-right text-right">
+						<!-- 提问图标 -->
+						<span id="ask">
+                            <!--加号 ➕ -->
+							<span class="glyphicon glyphicon-plus"></span>
+							提问
+						</span> 
+						&nbsp;&nbsp;&nbsp; 
+						<!-- 用户图标 -->
+						<span id="user" class="dropdown-toggle" data-toggle="dropdown">
+							<span class="glyphicon glyphicon-user"></span>
+							<!--预留一个span标签来存放用户昵称-->
+							<span>aaaa</span>
+						</span>
+						<!-- 下拉菜单 -->
+						<ul class="dropdown-menu dropdown-menu-right" style="min-width: 90px;">
+							<li><a href="./uploadImg.html"  class="text-right">上传头像</a></li>
+							<!--分隔线-->
+                            <li class="divider"></li>  
+							<li id="logout"><a class="text-right">退出登陆</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</nav>
+        <!-- 创建容器，展示所有问题 -->
+		<div class="container questions"></div>
+</body>
+</html>
+<script src="js/jquery.js"></script>
+<script src="js/jquery.cookie.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script> 
+<script src="./first.js"></script>
+
+
+<script>
+
+	$.get('/question/all',function(respondData){
+		console.log(respondData); 
+		//遍历返回的数组、
+		//有多少条数据 就创建/拼接 多少容器、并展示出来
+		var htmlStr = '';
+		for(var i = 0;i<respondData.length;i++){ 
+			// 采用的是 Bootstrap 里面的多媒体对象
+		var question = respondData[i];
+		// 这是外层
+		htmlStr += '<div class="media" data-question="' + new Date(question.time).getTime() + '">'
+		// 内层第一块,显示头像的地方 pull-left
+		htmlStr += '<div class="media-left"><a>'
+		htmlStr += '<img class="media-object" src="./Photos/'+question.petname +'.jpg" onerror="defaultHeaderImage(this)">'
+		htmlStr += '</a></div>'
+		// 内层第二块,显示问题用的
+		htmlStr += '<div class="media-body">'
+		htmlStr += '<h4 class="media-heading">' + question.petname + '</h4>'
+		htmlStr += question.content
+		htmlStr += '<div class="media-footing">' + formatTime(question.time) + '&#x3000;' + formatIP(question.ip) + '</div>';
+		htmlStr += '</div></div>'
+		
+		// 判断这个问题 是否有人回答过
+		if(question.answers){
+			// 有人回答过,显示回答
+			for(var j = 0; j < question.answers.length; j++){
+				var answer = question.answers[j];
+				// 内部的外层
+				htmlStr += '<div class="media media-child">'
+				// 内层的第一块
+				htmlStr += '<div class="media-body">'
+				htmlStr += '<h4 class="media-heading">' + answer.petname + '</h4>'
+				htmlStr += answer.content
+				htmlStr += '<div class="media-footing">' + formatTime(answer.time) + '&#x3000;' + formatIP(answer.ip) +'</div>';
+				htmlStr += '</div>'
+				// 内层第二块
+				htmlStr += '<div class="media-right"><a>'
+				htmlStr += '<img class="media-object" src="./Photos/'+answer.petname +'.jpg" onerror="defaultHeaderImage(this)">'
+				htmlStr += '</a></div></div>'
+			}	
+		}
+		htmlStr += '<hr>'
+
+		}
+		$('.questions').html(htmlStr)
+	}) 
+	// 如果没有上传头像 可以设置默认头像
+	function defaultHeaderImage(tou){
+		tou.src = './image/tou.jpg';
+	} 
+
+
+	$('.questions').on('click','.media[data-question]',function(){
+		console.log($(this));
+		// 如果用户已经登录 那么点击div进入回答页面
+		// 如果用户未登录 那么点击div进入登录页面
+		if(petname){
+
+			// 记录/存储 data-question属性值，以便将数据存到对应的文件中
+			$.cookie('questionURL',$(this).data('question'));
+			location.href = './answer.html'
+		}else{
+			location.href = './login.html'
+		}
+	})
+
+
+
+
+
+		
+	// 格式化时间
+	function formatTime(time){    
+		var date = new Date(time)
+		// Fri Sep 29 2017 17:09:57 GMT+0800 (CST)
+
+		var year = date.getFullYear();
+		var month = date.getMonth() + 1;
+		var day = date.getDate();
+
+		var hour = date.getHours();
+		var minute = date.getMinutes();
+		var seconds = date.getSeconds();
+		// 星期 0 1 2 3 
+		var week = date.getDay();
+
+		month = month<10? '0'+month : month;
+		day = day<10? '0'+day : day;
+
+		hour = hour<10? '0'+hour : hour;
+		minute = minute<10? '0'+minute : minute;
+		seconds = seconds<10? '0'+seconds : seconds;
+		
+		return year+'-'+month+'-'+day + ' '+hour+':'+minute+':'+seconds;
+	}
+
+
+	// 格式化ip
+	function formatIP(ip){    
+		// ::ffff:192.168.1.97 访客
+		// ::1 本地 
+		if(ip.startsWith('::1')){
+			return '127.0.0.1'
+		}
+		if(ip.startsWith('::ffff:')){
+			return ip.substr(7);
+		}
+	}
+
+
+</script>
+
+

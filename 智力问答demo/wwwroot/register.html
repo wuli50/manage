@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no"/>
+		<title>注册页面-智力问答</title>
+		<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/all.css">
+	</head>
+	<body>
+		<!-- 导航条 -->
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="row">
+					<div class="navbar-title">
+						<span id="goBack" class="glyphicon glyphicon-chevron-left pull-left"></span>
+						注册
+						<span id="home" class="glyphicon glyphicon-home pull-right"></span>
+					</div>
+				</div>
+			</div>
+		</nav>
+		
+		<!-- 注册表单 -->
+		<div class="container">
+			<form action="/user/register" method="post">
+				<!-- 昵称 -->
+				<div class="form-group">
+					<input type="text" class="form-control" name="petname" required pattern="^[a-zA-Z0-9\u4e00-\u9fa5]{2,16}$" placeholder="请填写昵称" />
+				</div>
+				<!-- 密码 -->
+				<div class="form-group">
+					<input type="password" class="form-control" name="password" required pattern="^.{6,16}" placeholder="请填写密码"/>
+				</div>
+				<!-- 确认密码 -->
+				<div class="form-group">
+					<input type="password" class="form-control" required pattern="^.{6,16}" placeholder="请再次填写密码" />
+				</div>
+				<!-- 性别 -->
+				<div class="checkbox">
+					<label for="male">
+						<input type="radio" name="isMale" value="true" id="male" checked />
+						先生
+					</label>
+				</div>
+				<div class="checkbox">
+					<label for="female">
+						<input type="radio" name="isMale" value="false" id="female" />
+						女士
+					</label>
+				</div>
+				<!-- 邮箱 -->
+				<div class="form-group">
+					<input type="email" class="form-control" name="email" required pattern="^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$" placeholder="请填写邮箱" />
+				</div>
+				<!-- 所学课程 -->
+				<div class="form-group">
+					<select name="course" class="form-control">
+						<option value="HTML5" selected>HTML5</option>
+						<option value="iOS" selected>iOS</option>
+						<option value="Android" selected>Android</option>
+					</select>
+				</div>
+				<!-- 提交按钮 -->
+				<input type="submit" class="btn btn-success form-control" value="注册" />
+			</form>
+		</div>
+		
+		<!-- 模态框（Modal）-->
+		<div class="modal fade" role="dialog" id="myModal">
+			 <div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<!--头部-->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">智力</h4>
+					</div>
+					 <!--身体-->
+					<div class="modal-body">
+						
+					</div>
+					<!--底部按钮-->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+<script src="js/jquery.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+
+<script>
+
+	// 监听表单的提交事件
+	$('form').submit(function(event){
+		// 阻止表单的默认事件
+		event.preventDefault();
+		// 1表单的数据不为空    
+		// 2表单的数据格式对不对（1，2两步通过表单的属性判断）
+		// 3两次密码是否一致
+
+
+		// 获取密码
+		var passwords = $('input[type=password]').map(function(){
+			return $(this).val();
+		});
+		// 判断两次密码是否一致
+		if(passwords[0] != passwords[1]){
+			// 将提示信息展示在模态框中
+			$('.modal-body').text('两次输入不一致，重写！！！')
+			// 将模态框展示出来
+			$('#myModal').modal('show');
+			
+			// 跳出函数，不再往下执行
+			return;
+		}
+
+		// 获取表单数据
+		// var data = new FormData(this);
+		// 通过ajax的serialize() 用于提交表单元素的数据，编码成字符串格式
+		var data =  $(this).serialize();
+
+		// 发送post请求 注册新用户
+		// 参二 data 请求的数据，发送请求时 将从前端发送给服务器的数据
+		// 参三 请求成功的回调，responseData 响应的数据 服务器发送给前端的数据
+		$.post('/user/register',data,function(responseData,textStatus,jqXHR){
+			// 将提示信息展示在模态框中
+			$('.modal-body').text(responseData.message);
+			// 将模态框展示出来
+			// hide.bs.modal 绑定模态框的关闭事件
+			$('#myModal').modal('show').on('hide.bs.modal',function(){
+				// 关闭弹出框 
+				if(responseData.code == '1'){
+					// 如果是注册成功的状态 则跳转到登录页面
+					location.href = './login.html'
+				}
+			});
+
+		});
+	})
+
+	
+
+	// 返回 
+	$('#goBack').click(function(){
+		// location.href()
+		// history.back()
+		history.go(-1)
+	})
+
+
+	// home图标-》 首页
+	$('#home').click(function(){
+		location.href = '/'
+	})
+
+</script>
+
+

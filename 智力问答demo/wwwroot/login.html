@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no"/>
+		<title>登陆页面-智力问答</title>
+		<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/all.css">
+	</head>
+	<body>
+		<!-- 导航条 -->
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="row">
+					<div class="navbar-title">
+						<span id="goBack" class="glyphicon glyphicon-chevron-left pull-left"></span>
+						登陆
+						<span id="register" class="glyphicon glyphicon-plus-sign pull-right"></span>
+					</div>
+				</div>
+			</div>
+		</nav>
+		
+		<!-- 登陆表单 -->
+		<div class="container">
+			<form action="/user/login" method="post">
+				<!-- 昵称 -->
+				<div class="form-group">
+					<input type="text" class="form-control" name="petname" required pattern="^[a-zA-Z0-9\u4e00-\u9fa5]{2,16}$" placeholder="请填写昵称" />
+				</div>
+				<!-- 密码 -->
+				<div class="form-group">
+					<input type="password" class="form-control" name="password" required pattern="^.{6,16}" placeholder="请填写密码"/>
+				</div>
+				<!-- 提交按钮 -->
+				<input type="submit" class="btn btn-success form-control" value="登陆" />
+			</form>
+		</div>
+		
+		<!-- 模态框（Modal）-->
+		<div class="modal fade" role="dialog" id="myModal">
+			 <div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" id="myModalLabel">智力</h4>
+					</div>
+					<div class="modal-body">
+						
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+<script src="js/jquery.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script> 
+
+<script>
+
+	$('form').submit(function(event){
+		// 阻止表单的默认事件
+		// 获取表单数据
+		// 发送post请求
+
+		event.preventDefault();
+		var data = $(this).serialize();
+		$.post('/user/login',data,function(respondData){
+
+			// 将提示信息展示在模态框中
+			$('.modal-body').text(respondData.message);
+			// 将模态框展示出来
+			// hide.bs.modal 绑定模态框的关闭事件
+			$('#myModal').modal('show').on('hide.bs.modal',function(){
+				// 关闭弹出框 
+				if(respondData.code == '1'){
+					// 如果是登录成功的状态 则跳转到首页页面
+					location.href = '/'
+				}
+			}) 
+		}) 
+	})
+
+
+
+	// 返回 
+	$('#goBack').click(function(){
+		// location.href()
+		// history.back()
+		history.go(-1)
+	})
+
+
+	// 加号按钮 -》 注册
+	$('#register').click(function(){
+		location.href = './register.html'
+	})
+
+
+
+</script>
